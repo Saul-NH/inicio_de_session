@@ -19,13 +19,8 @@ if (PERSISTENCE_TYPE === 'FILE') {
 }
 
 if (PERSISTENCE_TYPE === 'MONGO') {
-    import('../database/dbConection.js')
-        .then(() => {})
-        .then(() => {
-            import('../daos/index.js').then(
-                ({ productMongoDBDAO }) => (productDAO = productMongoDBDAO)
-            );
-        })
+    import('../daos/index.js')
+        .then(({ productMongoDBDAO }) => (productDAO = productMongoDBDAO))
         .catch((error) => {
             console.error(error);
         });
@@ -43,13 +38,13 @@ export const getAllProducts = async (req, res) => {
     }
 };
 
-export const addProduct = async(req, res) => {
+export const addProduct = async (req, res) => {
     try {
         const productCreated = await productDAO.add(req.body);
-        
+
         res.json({
-            'product':productCreated
-        })
+            product: productCreated,
+        });
     } catch (error) {
         console.log(error);
     }

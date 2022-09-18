@@ -7,17 +7,18 @@ import express from 'express';
 import socket from './utils/socket.js';
 import session from 'express-session';
 
+//DB connection
+import db from './database/dbConection.js'
 
 //Routers
 import messagesRouter from './routes/messages.routes.js';
 import productsRouter from './routes/products.routes.js';
 import productsTestRouter from './routes/productsTest.routes.js';
-import loginRouter from './routes/login.routes.js';
-import logoutRouter from './routes/logout.routes.js';
+import authRoutes from './routes/auth.routes.js'
 
 
 //Middlewares
-import { checkSession } from './middlewares/checkSession.js';
+import passport,{isAuthenticated} from './utils/passport.js'
 
 
 const app = express();
@@ -33,18 +34,20 @@ app.use('/public', express.static( path.join( __dirname, '/public') ) );
 
 app.use(session(SESSION_CONFIG));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 
 
 //Routes
-app.use('/logout',              logoutRouter);
-app.use('/login',               loginRouter);
+app.use('/auth',                authRoutes);
 app.use('/api/messages',        messagesRouter);
 app.use('/api/products',        productsRouter);
 app.use('/api/products-test',   productsTestRouter);
 
-app.get('/', checkSession, (req, res) => {
-    const username = req.session.username;
+app.get('/', isAuthenticated, (req, res) => {
+    const username = req.user.username;
     res.render('index', { username });
 });
 
